@@ -10,6 +10,13 @@ let copyArray = (arr1) => {
     return arr2;
 }
 
+let removeSign = (num) => {
+    if (num[0] == "-") {
+        num = num.substring(1);
+    }
+    return num;
+}
+
 class InputHandler extends Component {
     constructor(props) {
         super(props);
@@ -17,83 +24,66 @@ class InputHandler extends Component {
         this.state = {
             negNums: [],
             posNums: [],
-            goalNums: [],
             calcLists: [],
-            nums: [],
             goals: [],
             vs: []
         }
     }
 
+    renderNumbers(nums, type="") {
+        let listItems = [];
+        for(let i = 0; i < nums.length; i ++) {
+            listItems.push(<li key={i+type}>{nums[i]}</li>);
+        }
+        return listItems;
+    }
+
     addNegNum() {
         let nums = this.state.negNums;
-        let n = this.state.nums;
-        let size = nums.length + 1;
-        let t = document.getElementById("neg-nums").value;
-        let ns = t.split(' ');
+        let ns= document.getElementById("neg-nums").value.split(' ');
         for (let i = 0; i < ns.length; i ++) {
-            nums.push(<li key={size}>{ns[i]}</li>);
-            n.push(parseFloat(ns[i]));
+            let val = removeSign(ns[i]);
+            nums.push(-parseFloat(val));
         }
         this.setState({
             negNums: nums,
-            nums: n
         });
     }
 
     addPosNum() {
         let nums = this.state.posNums;
-        let n = this.state.nums;
-        let size = nums.length + 1;
-        let t = document.getElementById("pos-nums").value;
-        let ns = t.split(' ');
+        let ns = document.getElementById("pos-nums").value.split(' ');
         for (let i = 0; i < ns.length; i ++) {
-            nums.push(<li key={size}>{ns[i]}</li>);
-            n.push(parseFloat(ns[i]));
+            let val = ns[i];
+            nums.push(parseFloat(val));
         }
         this.setState({
             posNums: nums,
-            nums: n
         });
     }
 
     addGoalNum() {
-        let nums = this.state.goalNums;
         let goals = this.state.goals;
-        let size = nums.length + 1;
-        let t = document.getElementById("goal-nums").value;
-        let ns = t.split(' ');
+        let ns = document.getElementById("goal-nums").value.split(' ');
         for (let i = 0; i < ns.length; i ++) {
-            nums.push(<li key={size}>{ns[i]}</li>);
-            goals.push(parseFloat(ns[i]));
+            let val = ns[i];
+            goals.push(parseFloat(val));
         }
         this.setState({
-            goalNums: nums,
             goals: goals
         });
     }
 
     calcNums() {
 
-        let x = this.state.nums;
+        let x = this.state.posNums.concat(this.state.negNums);
         for (let i = 0; i < this.state.goals.length; i ++) {
             console.log(`Find values for : ${this.state.goals[i]}`);
             console.log(`Out of ${x}`);
-            console.log(this.findValue(x, this.state.goals[i]));
+            let res = this.tryValue(x, this.state.goals[i], 0, parseFloat('0.00'), []);
+            console.log(res)
         }
-
-    }  
-
-    findValue(nums, goal) {
-        let checked = false;
-        let i = 0;
-
-        let res = this.tryValue(nums, goal, 0, parseFloat('0.00'), [])
-    
-        console.log(res);
-
     }
-
 
     tryValue(nums, goal, i, total, usedNums) {
 
@@ -128,17 +118,20 @@ class InputHandler extends Component {
                 console.log("Something Unexpected");
             }
         }
-
     }
 
-
     render() {
+
+        let negNums = this.renderNumbers(this.state.negNums, 'positive');
+        let posNums = this.renderNumbers(this.state.posNums, 'negative');
+        let goalNums = this.renderNumbers(this.state.goals, 'goal');
+
         return(
             <div id="input-handler-root">
                 <InputView
-                    negNums={this.state.negNums}
-                    posNums={this.state.posNums}
-                    goalNums={this.state.goalNums}
+                    negNums={negNums}
+                    posNums={posNums}
+                    goalNums={goalNums}
                     calcLists={this.state.calcLists}
                     addPosNum={() => this.addPosNum()}
                     addNegNum={() => this.addNegNum()}
